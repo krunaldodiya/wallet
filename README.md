@@ -8,7 +8,7 @@ This package is a small and simple implementation of this concept with place for
 Install the package with composer:
 
 ```bash
-composer require kunaldodiya/wallet
+composer require krunaldodiya/wallet
 ```
 
 ## Run Migrations
@@ -70,7 +70,7 @@ If you discover any security related issues, please email kunal.dodiya1@gmail.co
 
 ## Credits
 
-- [Krunal Dodiya](https://github.com/kunaldodiya)
+- [Krunal Dodiya](https://github.com/krunaldodiya)
 
 ## License
 

@@ -1,12 +1,12 @@
 {
-  "name": "kunaldodiya/wallet",
+  "name": "krunaldodiya/wallet",
   "description": "laravel wallet",
   "keywords": [
-    "kunaldodiya",
+    "krunaldodiya",
     "laravel",
     "wallet"
   ],
-  "homepage": "https://github.com/kunaldodiya/wallet",
+  "homepage": "https://github.com/krunaldodiya/wallet",
   "license": "MIT",
   "type": "library",
   "authors": [
