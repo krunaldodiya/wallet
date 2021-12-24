@@ -1,0 +1,53 @@
+{
+  "name": "kunaldodiya/wallet",
+  "description": "laravel wallet",
+  "keywords": [
+    "kunaldodiya",
+    "laravel",
+    "wallet"
+  ],
+  "homepage": "https://github.com/kunaldodiya/wallet",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Krunal Dodiya",
+      "email": "kunal.dodiya1@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "illuminate/support": "~7|~8"
+  },
+  "require-dev": {
+      "phpunit/phpunit": "~9.0",
+      "orchestra/testbench": "~5|~6"
+  },
+  "autoload": {
+      "psr-4": {
+          "KD\\Wallet\\": "src/"
+      }
+  },
+  "autoload-dev": {
+      "psr-4": {
+          "KD\\Wallet\\Tests\\": "tests"
+      }
+  },
+  "extra": {
+      "laravel": {
+          "providers": [
+              "KD\\Wallet\\WalletServiceProvider"
+          ],
+          "aliases": {
+              "Wallet": "KD\\Wallet\\Facades\\Wallet"
+          }
+      }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
