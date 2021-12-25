@@ -3,7 +3,6 @@
 namespace KD\Wallet;
 
 use Illuminate\Support\ServiceProvider;
-use KD\Wallet\Models\Wallet;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -15,26 +14,11 @@ class WalletServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'wallet');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'wallet');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         // $this->loadRoutesFrom(__DIR__ . '/routes');
 
         if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../config/wallet.php' => config_path('wallet.php'),
-            ], 'config');
-            $this->publishes([
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/wallet'),
-            ], 'views');
-            $this->publishes([
-                __DIR__ . '/../resources/assets' => public_path('vendor/wallet'),
-            ], 'assets');
-            $this->publishes([
-                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/wallet'),
-            ], 'lang');
-            // Registering package commands.
-            // $this->commands([]);
+            $this->bootForConsole();
         }
     }
     /**
@@ -43,8 +27,50 @@ class WalletServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/wallet.php', 'wallet');
+
         $this->app->singleton('wallet', function () {
             return new Wallet;
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return ['wallet'];
+    }
+
+    /**
+     * Console-specific booting.
+     *
+     * @return void
+     */
+    protected function bootForConsole(): void
+    {
+        // Publishing the configuration file.
+        $this->publishes([
+            __DIR__.'/../config/wallet.php' => config_path('wallet.php'),
+        ], 'wallet.config');
+
+        // Publishing the views.
+        /*$this->publishes([
+            __DIR__.'/../resources/views' => base_path('resources/views/vendor/kd'),
+        ], 'wallet.views');*/
+
+        // Publishing assets.
+        /*$this->publishes([
+            __DIR__.'/../resources/assets' => public_path('vendor/kd'),
+        ], 'wallet.views');*/
+
+        // Publishing the translation files.
+        /*$this->publishes([
+            __DIR__.'/../resources/lang' => resource_path('lang/vendor/kd'),
+        ], 'wallet.views');*/
+
+        // Registering package commands.
+        // $this->commands([]);
     }
 }

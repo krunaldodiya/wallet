@@ -1,20 +1,19 @@
 {
   "name": "krunaldodiya/wallet",
   "description": "laravel wallet",
-  "keywords": [
-    "krunaldodiya",
-    "laravel",
-    "wallet"
-  ],
-  "homepage": "https://github.com/krunaldodiya/wallet",
   "license": "MIT",
-  "type": "library",
   "authors": [
     {
       "name": "Krunal Dodiya",
       "email": "kunal.dodiya1@gmail.com",
       "role": "Developer"
     }
+  ],
+  "homepage": "https://github.com/krunaldodiya/wallet",
+  "keywords": [
+    "krunaldodiya",
+    "laravel",
+    "wallet"
   ],
   "require": {
     "illuminate/support": "~7|~8"
@@ -42,12 +41,5 @@
               "Wallet": "KD\\Wallet\\Facades\\Wallet"
           }
       }
-  },
-  "scripts": {
-    "test": "vendor/bin/phpunit",
-    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-  },
-  "config": {
-    "sort-packages": true
   }
 }
