@@ -99,7 +99,7 @@ trait HasWallet
             'user_id' => $this->id,
             'amount' => $amount,
             'transaction_id' => Str::random(32),
-            'transaction_type' => $type === 'deposit' ?? 'withdraw',
+            'transaction_type' => $type === 'deposit' ? 'deposit' : 'withdraw',
             'status' => 'pending',
             'meta' => $meta,
         ]);
