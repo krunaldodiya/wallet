@@ -11,28 +11,6 @@ use Illuminate\Support\Str;
 
 trait HasWallet
 {
-    public function getBalanceAttribute()
-    {
-        return $this->wallet->balance;
-    }
-
-    public function actualBalance()
-    {
-        $credits = $this->wallet
-            ->transactions()
-            ->whereIn('transaction_type', ['deposit'])
-            ->where('status', 'success')
-            ->sum('amount');
-
-        $debits = $this->wallet
-            ->transactions()
-            ->whereIn('transaction_type', ['withdraw'])
-            ->where('status', 'success')
-            ->sum('amount');
-
-        return $credits - $debits;
-    }
-
     public function wallet()
     {
         return $this->hasOne(
@@ -46,13 +24,6 @@ trait HasWallet
             config('wallet.transaction_model', WalletTransaction::class),
             config('wallet.wallet_model', Wallet::class)
         )->latest();
-    }
-
-    public function getOrderById($transaction_id)
-    {
-        return WalletTransaction::where([
-            'transaction_id' => $transaction_id,
-        ])->first();
     }
 
     public function canWithdraw($amount)
@@ -107,12 +78,12 @@ trait HasWallet
 
     protected function processTransaction($transaction)
     {
-        $transaction->wallet->balance =
+        $this->wallet->balance =
             $transaction['transaction_type'] === 'deposit'
                 ? $transaction->wallet->balance + $transaction['amount']
                 : $transaction->wallet->balance - $transaction['amount'];
 
-        $transaction->wallet->save();
+        $this->wallet->save();
 
         $transaction->update(['status' => 'success']);
 
