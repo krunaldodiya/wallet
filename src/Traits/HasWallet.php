@@ -28,7 +28,7 @@ trait HasWallet
 
     public function canWithdraw($amount)
     {
-        return $this->balance >= $amount;
+        return $this->wallet->balance >= $amount;
     }
 
     public function deposit($amount, $meta = [])
