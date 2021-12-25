@@ -14,7 +14,7 @@ class WalletServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         // $this->loadRoutesFrom(__DIR__ . '/routes');
 
         if ($this->app->runningInConsole()) {
@@ -26,7 +26,7 @@ class WalletServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/wallet.php', 'wallet');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/wallet.php', 'wallet');
 
         $this->app->singleton('wallet', function () {
             return new Wallet;
@@ -52,7 +52,7 @@ class WalletServiceProvider extends ServiceProvider
     {
         // Publishing the configuration file.
         $this->publishes([
-            __DIR__.'/../config/wallet.php' => config_path('wallet.php'),
+            __DIR__. '/../../config/wallet.php' => config_path('wallet.php'),
         ], 'wallet.config');
 
         // Publishing the views.
