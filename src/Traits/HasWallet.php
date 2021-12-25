@@ -2,6 +2,8 @@
 
 namespace KD\Wallet\Traits;
 
+use Error;
+
 use KD\Wallet\Models\Wallet;
 use KD\Wallet\Models\WalletTransaction;
 
@@ -16,12 +18,14 @@ trait HasWallet
 
     public function actualBalance()
     {
-        $credits = $this->wallet->transactions()
+        $credits = $this->wallet
+            ->transactions()
             ->whereIn('transaction_type', ['deposit'])
             ->where('status', 'success')
             ->sum('amount');
 
-        $debits = $this->wallet->transactions()
+        $debits = $this->wallet
+            ->transactions()
             ->whereIn('transaction_type', ['withdraw'])
             ->where('status', 'success')
             ->sum('amount');
@@ -31,17 +35,24 @@ trait HasWallet
 
     public function wallet()
     {
-        return $this->hasOne(config('wallet.wallet_model', Wallet::class))->withDefault();
+        return $this->hasOne(
+            config('wallet.wallet_model', Wallet::class)
+        )->withDefault();
     }
 
     public function transactions()
     {
-        return $this->hasManyThrough(config('wallet.transaction_model', WalletTransaction::class), config('wallet.wallet_model', Wallet::class))->latest();
+        return $this->hasManyThrough(
+            config('wallet.transaction_model', WalletTransaction::class),
+            config('wallet.wallet_model', Wallet::class)
+        )->latest();
     }
 
     public function getOrderById($transaction_id)
     {
-        return WalletTransaction::where(['transaction_id' => $transaction_id])->first();
+        return WalletTransaction::where([
+            'transaction_id' => $transaction_id,
+        ])->first();
     }
 
     public function canWithdraw($amount)
@@ -49,19 +60,29 @@ trait HasWallet
         return $this->balance >= $amount;
     }
 
-    public function deposit($transactionId)
+    public function deposit($amount, $meta = [])
     {
-        return $this->processTransaction($transactionId);
+        $transaction = $this->createTransaction($amount, 'deposit', $meta);
+
+        return $this->processTransaction($transaction);
     }
 
-    public function withdraw($transactionId)
+    public function withdraw($amount, $meta = [])
     {
-        return $this->processTransaction($transactionId);
+        $transaction = $this->createTransaction($amount, 'withdraw', $meta);
+
+        return $this->processTransaction($transaction);
     }
 
-    public function forceWithdraw($transactionId)
+    public function forceWithdraw($amount, $meta = [])
     {
-        return $this->processTransaction($transactionId, true);
+        $transaction = $this->createTransaction(
+            $amount,
+            'forceWithdraw',
+            $meta
+        );
+
+        return $this->processTransaction($transaction, true);
     }
 
     public function createTransaction($amount, $type, $meta = [])
@@ -70,42 +91,30 @@ trait HasWallet
             $this->wallet->save();
         }
 
-        return $this->wallet->transactions()
-            ->create([
-                'user_id' => $this->id,
-                'amount' => $amount,
-                'transaction_id' => Str::random(32),
-                'transaction_type' => $type,
-                'status' => 'pending',
-                'meta' => $meta
-            ]);
+        if ($type === 'withdraw' && !$this->canWithdraw($amount)) {
+            throw new Error('Insufficient balance');
+        }
+
+        return $this->wallet->transactions()->create([
+            'user_id' => $this->id,
+            'amount' => $amount,
+            'transaction_id' => Str::random(32),
+            'transaction_type' => $type === 'deposit' ?? 'withdraw',
+            'status' => 'pending',
+            'meta' => $meta,
+        ]);
     }
 
-    protected function processTransaction($transactionId, $forceWithdraw = false)
+    protected function processTransaction($transaction)
     {
-        $transaction = WalletTransaction::where(['transaction_id' => $transactionId])->first();
+        $transaction->wallet->balance =
+            $transaction['transaction_type'] === 'deposit'
+                ? $transaction->wallet->balance + $transaction['amount']
+                : $transaction->wallet->balance - $transaction['amount'];
 
-        $canWithdraw = $forceWithdraw ? true : $this->canWithdraw($transaction['amount']);
+        $transaction->wallet->save();
 
-        if ($transaction['status'] === "pending") {
-            if ($transaction['transaction_type'] == 'deposit') {
-                $transaction->update(['status' => 'success']);
-
-                $transaction->wallet->balance = $transaction->wallet->balance + $transaction['amount'];
-                $transaction->wallet->save();
-            }
-
-            if ($transaction['transaction_type'] == 'withdraw') {
-                if ($canWithdraw) {
-                    $transaction->update(['status' => 'success']);
-
-                    $transaction->wallet->balance = $transaction->wallet->balance - $transaction['amount'];
-                    $transaction->wallet->save();
-                } else {
-                    $transaction->update(['status' => 'failed']);
-                }
-            }
-        }
+        $transaction->update(['status' => 'success']);
 
         return $transaction;
     }
